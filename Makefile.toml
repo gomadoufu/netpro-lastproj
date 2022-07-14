@@ -48,6 +48,7 @@ extend = "start"
 description = "Build and start Actix server with client on port 8000 in release mode"
 args = ["run", "--package", "server", "--release"]
 dependencies = ["build_release"]
+watch = false
 
 # ---- TEST ----
 
