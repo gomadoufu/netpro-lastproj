@@ -18,6 +18,7 @@ fn get_request_url() -> impl Into<Cow<'static, str>> {
 #[derive(Default, Debug)]
 pub struct Form {
     name: String,
+    id: String,
     contents: String,
 }
 
@@ -25,6 +26,7 @@ impl Form {
     fn to_form_data(&self) -> Result<web_sys::FormData, JsValue> {
         let form_data = web_sys::FormData::new()?;
         form_data.append_with_str("name", &self.name)?;
+        form_data.append_with_str("id", &self.id)?;
         form_data.append_with_str("contents", &self.contents)?;
         Ok(form_data)
     }
@@ -40,6 +42,7 @@ impl Default for Model {
     fn default() -> Self {
         Self::ReadyToSubmit(Form {
             name: "".into(),
+            id: "".into(),
             contents: "".into(),
         })
     }
@@ -66,6 +69,7 @@ impl Model {
 
 pub enum Msg {
     NameChanged(String),
+    IdChanged(String),
     ContentsChanged(String),
     FormSubmitted,
     ServerResponded(fetch::Result<String>),
@@ -74,6 +78,7 @@ pub enum Msg {
 pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::NameChanged(name) => model.form_mut().name = name,
+        Msg::IdChanged(id) => model.form_mut().id = id,
         Msg::ContentsChanged(contents) => model.form_mut().contents = contents,
         Msg::FormSubmitted => {
             let form = mem::take(model.form_mut());
@@ -136,7 +141,7 @@ pub fn view(model: &Model, intro: impl FnOnce(&str, &str) -> Vec<Node<Msg>>) -> 
         return nodes![intro(TITLE, THANKYOU)];
     }
 
-    let btn_enabled = matches!(model, Model::ReadyToSubmit(form) if !form.name.is_empty() && !form.contents.is_empty());
+    let btn_enabled = matches!(model, Model::ReadyToSubmit(form) if !form.name.is_empty() && !form.contents.is_empty() && !form.id.is_empty());
 
     let form = form![
         style! {
@@ -148,24 +153,35 @@ pub fn view(model: &Model, intro: impl FnOnce(&str, &str) -> Vec<Node<Msg>>) -> 
             Msg::FormSubmitted
         }),
         view_form_field(
-            label!["Name:", attrs! {At::For => "user-name" }],
+            label!["氏名:", attrs! {At::For => "user-name" }],
             input![
                 input_ev(Ev::Input, Msg::NameChanged),
                 attrs! {
                     At::Id => "user-name",
                     At::Value => model.form().name,
                     At::Required => true.as_at_value(),
+                    At::Rows => 1,
                 }
             ]
         ),
         view_form_field(
-            label!["Contents:", attrs! {At::For => "user-contents" }],
+            label!["学籍番号:", attrs! {At::For => "user-id" }],
+            textarea![
+                input_ev(Ev::Input, Msg::IdChanged),
+                attrs! {
+                    At::Id => "user-id",
+                    At::Value => model.form().id,
+                    At::Rows => 1,
+                },
+            ],
+        ),
+        view_form_field(
+            label!["", attrs! {At::For => "user-contents" }],
             textarea![
                 input_ev(Ev::Input, Msg::ContentsChanged),
                 attrs! {
                     At::Id => "user-contents",
                     At::Value => model.form().contents,
-                    At::Rows => 1,
                 },
             ],
         ),
@@ -175,7 +191,7 @@ pub fn view(model: &Model, intro: impl FnOnce(&str, &str) -> Vec<Node<Msg>>) -> 
                 "background-color" => if btn_enabled { CSSValue::from("aquamarine") } else { CSSValue::Ignored },
             },
             attrs! {At::Disabled => not(btn_enabled).as_at_value()},
-            "Submit"
+            "提出"
         ]
     ];
 
