@@ -7,6 +7,5 @@ pub struct SendMessageRequestBody {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SendMessageResponseBody {
-    pub ordinal_number: u32,
     pub text: String,
 }
