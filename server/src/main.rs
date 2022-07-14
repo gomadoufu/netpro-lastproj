@@ -1,36 +1,7 @@
-use actix::prelude::*;
 use actix_files::{Files, NamedFile};
 use actix_multipart::Multipart;
-use actix_web::{get, post, web, App, HttpServer, Result};
+use actix_web::{post, web, App, HttpServer, Result};
 use futures::stream::StreamExt;
-use std::fmt::Write;
-use std::time;
-
-mod count_actor;
-use count_actor::{CountActor, MsgIncrement};
-
-// ---- Apis ("/api/*") ----
-
-#[post("send-message")]
-async fn send_message(
-    state: web::Data<State>,
-    request_data: web::Json<shared::SendMessageRequestBody>,
-) -> Result<web::Json<shared::SendMessageResponseBody>> {
-    Ok(web::Json(shared::SendMessageResponseBody {
-        ordinal_number: state
-            .count_actor
-            .send(MsgIncrement)
-            .await
-            .expect("send MsgIncrement"),
-        text: request_data.text.clone(),
-    }))
-}
-
-#[get("delayed-response/{delay}")]
-async fn delayed_response(delay: web::Path<u64>) -> String {
-    futures_timer::Delay::new(time::Duration::from_millis(*delay)).await;
-    format!("Delay was set to {}ms.", delay)
-}
 
 #[post("form")]
 async fn form(mut form: Multipart) -> String {
@@ -52,11 +23,11 @@ async fn form(mut form: Multipart) -> String {
         name_text_pairs.push((field_name, field_text));
     }
 
-    let mut output = String::new();
+    let output = String::new();
     for (name, text) in name_text_pairs {
-        writeln!(&mut output, "{}: {}", name, text).unwrap();
-        writeln!(&mut output, "___________________").unwrap();
+        println!("{}: {}", name, text);
     }
+    println!("___________________");
     output
 }
 
@@ -65,22 +36,12 @@ async fn index() -> Result<NamedFile> {
     Ok(NamedFile::open("./client/index.html")?)
 }
 
-struct State {
-    count_actor: Addr<CountActor>,
-}
-
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    let count_actor_addr = CountActor(0).start();
     HttpServer::new(move || {
         App::new()
-            .data(State {
-                count_actor: count_actor_addr.clone(),
-            })
             .service(
                 web::scope("/api/")
-                    .service(send_message)
-                    .service(delayed_response)
                     .service(form)
                     .default_service(web::route().to(web::HttpResponse::NotFound)),
             )
