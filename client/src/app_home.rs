@@ -191,7 +191,7 @@ pub fn view(model: &Model, intro: impl FnOnce(&str, &str) -> Vec<Node<Msg>>) -> 
                 "background-color" => if btn_enabled { CSSValue::from("aquamarine") } else { CSSValue::Ignored },
             },
             attrs! {At::Disabled => not(btn_enabled).as_at_value()},
-            "提出✔︎"
+            "提出 ✔︎"
         ]
     ];
 
