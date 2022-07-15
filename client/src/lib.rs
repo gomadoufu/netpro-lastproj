@@ -1,5 +1,6 @@
 #![allow(clippy::enum_variant_names, clippy::large_enum_variant)]
 
+//複数のコンテナを管理するためのプログラム
 use seed::{prelude::*, *};
 
 mod app_home;
@@ -41,6 +42,7 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 //     View
 // ------ ------
 
+//タイトルと説明はここで描画
 fn view(model: &Model) -> impl IntoNodes<Msg> {
     div![
         style! {

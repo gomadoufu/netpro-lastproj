@@ -1,3 +1,6 @@
+//入力フォームを構成するためのプログラム
+//Seed
+
 use seed::{prelude::*, *};
 use std::borrow::Cow;
 use std::mem;
@@ -15,6 +18,7 @@ fn get_request_url() -> impl Into<Cow<'static, str>> {
 //     Model
 // ------ ------
 
+//フォームの種類
 #[derive(Default, Debug)]
 pub struct Form {
     name: String,
@@ -32,6 +36,7 @@ impl Form {
     }
 }
 
+//ページの状態モデル
 pub enum Model {
     ReadyToSubmit(Form),
     WaitingForResponse(Form),
@@ -67,6 +72,7 @@ impl Model {
 //    Update
 // ------ ------
 
+//ページのアップデートに使うメッセージ
 pub enum Msg {
     NameChanged(String),
     IdChanged(String),
@@ -75,6 +81,7 @@ pub enum Msg {
     ServerResponded(fetch::Result<String>),
 }
 
+//アップデート関数
 pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::NameChanged(name) => model.form_mut().name = name,
@@ -109,6 +116,7 @@ async fn send_request(form: FormData) -> fetch::Result<String> {
         .await
 }
 
+//入力欄をクリアするユーティリティ
 #[allow(clippy::option_map_unit_fn)]
 fn clear_file_input() {
     seed::document()
@@ -136,13 +144,17 @@ fn view_form_field(mut label: Node<Msg>, control: Node<Msg>) -> Node<Msg> {
     ]
 }
 
+//ページのビューを構成する関数
 pub fn view(model: &Model, intro: impl FnOnce(&str, &str) -> Vec<Node<Msg>>) -> Vec<Node<Msg>> {
+    //ModelがFinishだったら終了する
     if let Model::Finish = model {
         return nodes![intro(TITLE, THANKYOU)];
     }
 
+    //すべてのフォームを埋めるまでボタンを有効にしない
     let btn_enabled = matches!(model, Model::ReadyToSubmit(form) if !form.name.is_empty() && !form.contents.is_empty() && !form.id.is_empty());
 
+    //インプットフォームの作成
     let form = form![
         style! {
             St::Display => "flex",
@@ -185,6 +197,7 @@ pub fn view(model: &Model, intro: impl FnOnce(&str, &str) -> Vec<Node<Msg>>) -> 
                 },
             ],
         ),
+        //提出ボタンの作成
         button![
             style! {
                 "padding" => format!("{} {}", px(2), px(12)),

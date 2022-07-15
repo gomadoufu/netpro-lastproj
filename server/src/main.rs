@@ -3,6 +3,7 @@ use actix_multipart::Multipart;
 use actix_web::{post, web, App, HttpServer, Result};
 use futures::stream::StreamExt;
 
+//フォームを取得する
 #[post("form")]
 async fn form(mut form: Multipart) -> String {
     let mut name_text_pairs: Vec<(String, String)> = Vec::new();
@@ -23,6 +24,7 @@ async fn form(mut form: Multipart) -> String {
         name_text_pairs.push((field_name, field_text));
     }
 
+    //コンソールに出力
     let output = String::new();
     for (name, text) in name_text_pairs {
         println!("{}: {}", name, text);
@@ -31,17 +33,20 @@ async fn form(mut form: Multipart) -> String {
     output
 }
 
+//ルーティング
 #[allow(clippy::unused_async)]
 async fn index() -> Result<NamedFile> {
     Ok(NamedFile::open("./client/index.html")?)
 }
 
+//メイン関数
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .service(
                 web::scope("/api/")
+                    //フォーム入力
                     .service(form)
                     .default_service(web::route().to(web::HttpResponse::NotFound)),
             )
