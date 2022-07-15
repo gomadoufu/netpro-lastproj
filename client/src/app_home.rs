@@ -3,9 +3,9 @@ use std::borrow::Cow;
 use std::mem;
 use web_sys::{self, FormData};
 
-pub const TITLE: &str = "リアクションペーパー りあぺぱ";
-pub const DESCRIPTION: &str = "名前と学籍番号、今日の授業の感想を入力してください";
-pub const THANKYOU: &str = "ご回答ありがとうございました";
+pub const TITLE: &str = "リアクションペーパー 📝りあぺぱ📝";
+pub const DESCRIPTION: &str = "名前と学籍番号、今日の授業の感想を入力してください❗️";
+pub const THANKYOU: &str = "ご回答ありがとうございました🐈🦀";
 
 fn get_request_url() -> impl Into<Cow<'static, str>> {
     "/api/form"
@@ -191,7 +191,7 @@ pub fn view(model: &Model, intro: impl FnOnce(&str, &str) -> Vec<Node<Msg>>) -> 
                 "background-color" => if btn_enabled { CSSValue::from("aquamarine") } else { CSSValue::Ignored },
             },
             attrs! {At::Disabled => not(btn_enabled).as_at_value()},
-            "提出"
+            "提出✔︎"
         ]
     ];
 
