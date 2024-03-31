@@ -8,9 +8,12 @@ Web上で名前と感想などを入力して提出し、サーバで一覧で�
 
 ## Requirements
 
-seed 0.8.0  
-actix-web 3.1.0
+[cargo-make](https://github.com/sagiegurari/cargo-make)  
+
+`cargo install --force cargo-make`
 
 ## Usage
 
-`Cargo start-release`
+`cargo start --release`  
+
+`http://localhost:8000`にアクセス
