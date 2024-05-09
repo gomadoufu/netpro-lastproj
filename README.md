@@ -15,6 +15,6 @@ Web 上で名前と感想などを入力して提出し、サーバで一覧で�
 
 ## Usage
 
-`cargo start --release`
+`cargo make start --release`
 
 `http://localhost:8000`にアクセス
